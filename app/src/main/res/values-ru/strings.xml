@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fake GPS</string>
+    <string name="search_hint">Адрес или место…</string>
+    <string name="search">Поиск</string>
+    <string name="start">Старт</string>
+    <string name="stop">Стоп</string>
+    <string name="tap_map_hint">Нажмите на карту, чтобы выбрать место</string>
+    <string name="picked_point">Выбранное место</string>
+    <string name="current_fake_location">Текущая фейковая локация</string>
+    <string name="favorites">Избранное</string>
+    <string name="add_favorite">В избранное</string>
+    <string name="favorite_name_hint">Название (например, Дом)</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_favorite_confirm">Удалить это избранное?</string>
+    <string name="setup_title">Настройка</string>
+    <string name="setup_steps">1. Настройки → О телефоне\n2. Нажмите 7 раз на «Номер сборки» (включатся Опции разработчика)\n3. Опции разработчика → Приложение для фиктивных местоположений\n4. Выберите Fake GPS\n5. Вернитесь, выберите место и нажмите Старт</string>
+    <string name="open_dev_options">Открыть опции разработчика</string>
+    <string name="mock_not_selected_warning">Приложение не выбрано как приложение для фиктивных местоположений — сначала настройте, иначе телепорт не сработает.</string>
+    <string name="mock_failed">Не удалось запустить — проверьте, что Fake GPS выбран как приложение для фиктивных местоположений.</string>
+    <string name="no_favorites">Избранного пока нет — сначала выберите место на карте.</string>
+    <string name="need_point_first">Сначала выберите место на карте</string>
+    <string name="notification_channel_name">Fake GPS</string>
+    <string name="notification_title">Fake GPS включён</string>
+    <string name="notification_text">Фейковая локация: %1$s</string>
+    <string name="about_limits_text">Приложение использует официальную систему фиктивных местоположений Android. Работает в Google Maps и WhatsApp, но приложения, которые определяют фиктивное местоположение, определят и это. После перезагрузки телефона нужно включить заново.</string>
+</resources>
