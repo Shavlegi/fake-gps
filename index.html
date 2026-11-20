@@ -4,11 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fake GPS — ჩამოტვირთვა</title>
-<meta name="description" content="მარტივი Fake GPS აპი Android-ზე — რუკაზე ადგილის არჩევა, ტელეპორტი, ფავორიტები. უფასო APK.">
+<meta name="description" content="მარტივი Fake GPS აპი Android-ზე — რუკაზე ადგილის არჩევა, ტელეპორტი, ფავორიტები. უფასო APK. დეტალური ინსტრუქცია ნაბიჯ-ნაბიჯ.">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #0B0F19; color: #fff; font-family: -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6; padding: 24px 16px 48px; }
-  .wrap { max-width: 560px; margin: 0 auto; text-align: center; }
+  .wrap { max-width: 600px; margin: 0 auto; text-align: center; }
   .pin { width: 84px; height: 84px; margin: 24px auto 12px; background: #4C8DFF; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; }
   .pin span { transform: rotate(45deg); font-size: 38px; }
   h1 { font-size: 34px; margin-bottom: 6px; }
@@ -17,9 +17,13 @@
   .dl:active { opacity: .85; }
   .ver { color: #9AA5B1; font-size: 14px; margin-bottom: 32px; }
   .card { background: #141B2A; border-radius: 14px; padding: 20px; margin-bottom: 16px; text-align: left; }
-  .card h2 { font-size: 18px; margin-bottom: 10px; }
-  .card ul, .card ol { padding-left: 20px; }
+  .card h2 { font-size: 18px; margin-bottom: 12px; }
+  .card ul { padding-left: 20px; }
   .card li { margin-bottom: 6px; color: #D5DBE3; }
+  .step { margin-bottom: 18px; }
+  .step h3 { font-size: 16px; color: #4C8DFF; margin-bottom: 4px; }
+  .step p { color: #D5DBE3; font-size: 15px; }
+  .step p b { color: #fff; }
   .note { color: #9AA5B1; font-size: 14px; }
   a.link { color: #4C8DFF; }
 </style>
@@ -45,16 +49,60 @@
   </div>
 
   <div class="card">
-    <h2>⚙️ დაყენება (ერთხელ)</h2>
-    <ol>
-      <li>APK დააინსტალირე</li>
-      <li>Settings → About phone → <b>MIUI version</b>-ზე დააჭირე 7-ჯერ (სხვა ტელეფონზე — Build number-ზე)</li>
-      <li>Settings → Developer options → <b>Select mock location app</b> → <b>Fake GPS</b></li>
-      <li>აპში აირჩიე ადგილი და დააჭირე Start-ს</li>
-    </ol>
+    <h2>📋 დაყენება — ნაბიჯ-ნაბიჯ</h2>
+
+    <div class="step">
+      <h3>ნაბიჯი 1 — APK-ის გადმოწერა</h3>
+      <p>ზემოთ <b>„ჩამოტვირთვა"</b> ღილაკს დააჭირე — app-debug.apk ფაილი გადმოვა. ბრაუზერი თუ გკითხავს, <b>„Download anyway" / „მაინც გადმოწერე"</b> აირჩიე.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 2 — APK-ის დაყენება</h3>
+      <p>გადმოწერილ ფაილს დააჭირე → <b>Install / დაყენება</b>. ტელეფონი თუ გკითხავს „Install unknown apps"-ზე ნებართვას, ბრაუზერს (ან File Manager-ს) <b>Allow / ნებართვა</b> მიეცი და ისევ Install-ს დააჭირე. ბოლოს <b>Open / გახსნა</b>.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 3 — Developer options-ის ჩართვა</h3>
+      <p>გახსენი <b>Settings → About phone</b> და <b>„MIUI version"</b>-ზე დააჭირე <b>7-ჯერ</b> ზედიზედ, სანამ „You are now a developer!" არ დაგიწერს. (სხვა ტელეფონზე იგივეა, ოღონდ <b>„Build number"</b>-ზე უნდა დააჭირო 7-ჯერ.)</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 4 — Fake GPS-ის არჩევა mock აპად</h3>
+      <p>გახსენი <b>Settings → Additional settings → Developer options</b>, იპოვე <b>„Select mock location app"</b>, დააჭირე და სიიდან <b>Fake GPS</b> აირჩიე. ეს ყველაზე მნიშვნელოვანი ნაბიჯია — ამის გარეშე ტელეპორტი არ იმუშავებს.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 5 — ლოკაციის ნებართვა</h3>
+      <p>Fake GPS აპი გახსენი. თუ ლოკაციის ნებართვას გთხოვს, <b>„While using the app" / „აპის გამოყენებისას"</b> აირჩიე. თუ არ გკითხა: <b>Settings → Apps → Fake GPS → Permissions → Location → Allow only while using the app</b>.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 6 — ტელეპორტი</h3>
+      <p>აპში რუკაზე დააჭირე ადგილს, სადაც „გადახვიდე" — ქვემოთ კოორდინატები გამოჩნდება. მერე ლურჯ <b>Start</b> ღილაკს დააჭირე. ეკრანის ზემოთ მწვანედ გამოჩნდება „მიმდინარე ყალბი ლოკაცია" — ესე იგი, ჩართულია.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 7 — შემოწმება</h3>
+      <p>გახსენი <b>Google Maps</b> — ლურჯი წერტილი („Your Location") იმ ადგილას უნდა იყოს, რაც აპში აირჩიე. იგივე WhatsApp-ზე ლოკაციის გაზიარებისასაც გამოჩნდება.</p>
+    </div>
+
+    <div class="step">
+      <h3>ნაბიჯი 8 — გაჩერება</h3>
+      <p>Fake GPS აპში <b>Stop</b> ღილაკს დააჭირე — რეალური ლოკაცია დაბრუნდება. გაითვალისწინე: ტელეფონის გადატვირთვის მერე fake ლოკაცია ითიშება და თავიდან უნდა ჩართო (ნაბიჯი 6).</p>
+    </div>
   </div>
 
-  <p class="note">აპი იყენებს Android-ის ოფიციალურ mock location სისტემას. Google Maps-სა და WhatsApp-ზე მუშაობს, მაგრამ აპები, რომლებიც mock-ლოკაციას ამჩნევენ, ამასაც ამჩნევენ. ტელეფონის გადატვირთვის მერე თავიდან უნდა ჩართო.</p>
+  <div class="card">
+    <h2>❓ არ მუშაობს?</h2>
+    <ul>
+      <li><b>Start-ზე აპი იხურება:</b> ლოკაციის ნებართვა მიეცი (ნაბიჯი 5) და აპი განაახლე v1.1-ზე.</li>
+      <li><b>ტელეპორტი არ მუშაობს:</b> შეამოწმე, რომ Developer options-ში Fake GPS-ია არჩეული mock აპად (ნაბიჯი 4).</li>
+      <li><b>„Please enable developer options first":</b> ჯერ Developer options ჩართე (ნაბიჯი 3).</li>
+      <li><b>რუკა არ იტვირთება:</b> ინტერნეტი შეამოწმე — რუკა ონლაინ იტვირთება.</li>
+    </ul>
+  </div>
+
+  <p class="note">აპი იყენებს Android-ის ოფიციალურ mock location სისტემას. Google Maps-სა და WhatsApp-ზე მუშაობს, მაგრამ აპები, რომლებიც mock-ლოკაციას ამჩნევენ, ამასაც ამჩნევენ.</p>
   <p class="note" style="margin-top:16px;">კოდი: <a class="link" href="https://github.com/Shavlegi/fake-gps">github.com/Shavlegi/fake-gps</a></p>
 </div>
 </body>
