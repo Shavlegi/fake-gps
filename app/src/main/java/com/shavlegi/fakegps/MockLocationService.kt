@@ -87,6 +87,21 @@ class MockLocationService : Service() {
     }
 
     private fun startMocking() {
+        try {
+            startMockingInner()
+        } catch (e: Exception) {
+            // Never crash the app from the service: report the failure
+            // as an error state so the UI can show a message instead.
+            MockLocationState.set(MockState.Error("mock_failed"))
+            try {
+                stopForeground(STOP_FOREGROUND_REMOVE)
+            } catch (ignored: Exception) {
+            }
+            stopSelf()
+        }
+    }
+
+    private fun startMockingInner() {
         val lm = getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationManager = lm
         try {
@@ -122,14 +137,23 @@ class MockLocationService : Service() {
 
         createChannel()
         val notification = buildNotification()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            startForeground(
-                NOTIFICATION_ID,
-                notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
-            )
-        } else {
-            startForeground(NOTIFICATION_ID, notification)
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                startForeground(
+                    NOTIFICATION_ID,
+                    notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
+                )
+            } else {
+                startForeground(NOTIFICATION_ID, notification)
+            }
+        } catch (e: SecurityException) {
+            // Android 14+: a location-type foreground service needs a
+            // granted runtime location permission. Without it the system
+            // throws here — report it instead of crashing.
+            MockLocationState.set(MockState.Error("location_permission"))
+            stopSelf()
+            return
         }
 
         MockLocationState.set(MockState.Mocking(latitude, longitude))

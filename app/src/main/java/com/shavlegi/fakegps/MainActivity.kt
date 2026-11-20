@@ -224,9 +224,45 @@ class FakeGpsViewModelFactory(
 
 class MainActivity : AppCompatActivity() {
 
+    private var pendingAfterPermission: (() -> Unit)? = null
+
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { /* Result ignored — the app works without location permission. */ }
+    ) { grants ->
+        // If location was just granted and a Start was waiting, run it now.
+        if (grants.values.any { it }) {
+            pendingAfterPermission?.invoke()
+        } else {
+            Toast.makeText(
+                this,
+                getString(R.string.location_permission_needed),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        pendingAfterPermission = null
+    }
+
+    /** Runs [onGranted] now if a location permission is granted, otherwise
+     *  asks for it first and runs it when the user allows. */
+    fun ensureLocationPermission(onGranted: () -> Unit) {
+        val granted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        if (granted) {
+            onGranted()
+            return
+        }
+        pendingAfterPermission = onGranted
+        permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -302,14 +338,13 @@ fun FakeGpsScreen() {
 
     // Show the failure reason if mocking could not start.
     LaunchedEffect(mockState) {
-        if (mockState is MockState.Error) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.mock_failed),
-                Toast.LENGTH_LONG
-            ).show()
-            viewModel.refreshMockAppStatus()
+        val error = mockState as? MockState.Error ?: return@LaunchedEffect
+        val textRes = when (error.messageKey) {
+            "location_permission" -> R.string.location_permission_needed
+            else -> R.string.mock_failed
         }
+        Toast.makeText(context, context.getString(textRes), Toast.LENGTH_LONG).show()
+        viewModel.refreshMockAppStatus()
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -554,7 +589,11 @@ fun FakeGpsScreen() {
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            viewModel.startMocking(context)
+                            // Location permission is required for the
+                            // foreground service — ask first, then start.
+                            (context as? MainActivity)?.ensureLocationPermission {
+                                viewModel.startMocking(context)
+                            } ?: viewModel.startMocking(context)
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
