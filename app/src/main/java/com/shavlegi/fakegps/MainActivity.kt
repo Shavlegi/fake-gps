@@ -45,7 +45,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Stop
+ 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -332,7 +332,7 @@ fun FakeGpsScreen() {
         factory = FakeGpsViewModelFactory(application)
     )
 
-    val picked by viewModel.picked.collectAsState()
+    val picked = viewModel.picked.collectAsState().value
     val favorites by viewModel.favorites.collectAsState()
     val searchResults by viewModel.searchResults.collectAsState()
     val searching by viewModel.searching.collectAsState()
@@ -780,7 +780,7 @@ fun FakeGpsScreen() {
                         .shadow(8.dp, RoundedCornerShape(18.dp))
                 ) {
                     Icon(
-                        imageVector = if (isMocking) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+                        imageVector = if (isMocking) Icons.Filled.Close else Icons.Filled.PlayArrow,
                         contentDescription = null,
                         tint = Color.White,
                         modifier = Modifier.size(24.dp)
