@@ -102,6 +102,7 @@ import kotlinx.coroutines.runBlocking
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
@@ -109,6 +110,18 @@ import org.osmdroid.views.overlay.Marker
 
 /** Akhaltsikhe — home. The map opens here on first launch. */
 private val HOME_POINT = GeoPoint(41.8458, 42.9996)
+
+/** CARTO dark tiles: fast CDN and they match the app's dark theme.
+ *  osmdroid 6.1.20 has no built-in CARTO source, so define it directly. */
+private val CARTO_DARK = XYTileSource(
+    "CartoDark", 4, 19, 256, ".png",
+    arrayOf(
+        "https://a.basemaps.cartocdn.com/dark_all/",
+        "https://b.basemaps.cartocdn.com/dark_all/",
+        "https://c.basemaps.cartocdn.com/dark_all/",
+        "https://d.basemaps.cartocdn.com/dark_all/"
+    )
+)
 
 class FakeGpsViewModel(application: Application) : AndroidViewModel(application) {
     private val store = FavoritesStore(application)
@@ -613,10 +626,10 @@ fun FakeGpsScreen() {
                         // CARTO dark tiles: fast CDN (no more grey squares
                         // waiting on the slow OSM tile server) and they match
                         // the app's dark theme.
-                        setTileSource(TileSourceFactory.CARTODB_DARK_MATTER)
+                        setTileSource(CARTO_DARK)
                         setBuiltInZoomControls(false)
                         setBackgroundColor(
-                            androidx.compose.ui.graphics.Color(0xFF0B0F19).toArgb()
+                            android.graphics.Color.parseColor("#0B0F19")
                         )
                         minZoomLevel = 4.0
                         maxZoomLevel = 19.0
