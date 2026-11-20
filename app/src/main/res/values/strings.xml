@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fake GPS</string>
+    <string name="search_hint">მისამართი ან ადგილი…</string>
+    <string name="search">ძებნა</string>
+    <string name="start">დაწყება</string>
+    <string name="stop">გაჩერება</string>
+    <string name="tap_map_hint">რუკაზე დააჭირე ადგილის ასარჩევად</string>
+    <string name="picked_point">არჩეული ადგილი</string>
+    <string name="current_fake_location">მიმდინარე ყალბი ლოკაცია</string>
+    <string name="favorites">ფავორიტები</string>
+    <string name="add_favorite">ფავორიტებში დამატება</string>
+    <string name="favorite_name_hint">სახელი (მაგ. სახლი)</string>
+    <string name="save">შენახვა</string>
+    <string name="cancel">გაუქმება</string>
+    <string name="delete">წაშლა</string>
+    <string name="delete_favorite_confirm">წავშალო ეს ფავორიტი?</string>
+    <string name="setup_title">დაყენება</string>
+    <string name="setup_steps">1. Settings → About phone\n2. Build number-ზე დააჭირე 7-ჯერ (Developer options ჩაირთვება)\n3. Developer options → Select mock location app\n4. აირჩიე Fake GPS\n5. დაბრუნდი აპში, აირჩიე ადგილი და დააჭირე დაწყებას</string>
+    <string name="open_dev_options">Developer options-ის გახსნა</string>
+    <string name="mock_not_selected_warning">აპი არ არის არჩეული mock location აპად — ჯერ დააყენე, თორემ ტელეპორტი არ იმუშავებს.</string>
+    <string name="mock_failed">ვერ ჩაირთო — შეამოწმე, რომ Fake GPS არჩეულია mock location აპად.</string>
+    <string name="no_favorites">ფავორიტები არ არის — ჯერ აირჩიე ადგილი რუკაზე.</string>
+    <string name="need_point_first">ჯერ აირჩიე ადგილი რუკაზე</string>
+    <string name="notification_channel_name">Fake GPS</string>
+    <string name="notification_title">Fake GPS ჩართულია</string>
+    <string name="notification_text">ყალბი ლოკაცია: %1$s</string>
+    <string name="about_limits_text">აპი იყენებს Android-ის ოფიციალურ mock location სისტემას. Google Maps-სა და WhatsApp-ზე მუშაობს, მაგრამ აპები, რომლებიც mock-ლოკაციას ამჩნევენ, ამასაც ამჩნევენ. ტელეფონის გადატვირთვის მერე თავიდან უნდა ჩართო.</string>
+</resources>
