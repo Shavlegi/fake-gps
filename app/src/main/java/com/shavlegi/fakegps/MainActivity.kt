@@ -10,7 +10,13 @@ import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,18 +28,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -50,6 +62,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,6 +72,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -73,6 +89,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.shavlegi.fakegps.ui.theme.FakeGpsTheme
@@ -81,6 +98,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -266,6 +284,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Apply the saved UI language (Georgian by default) before drawing,
+        // otherwise the phone's system language wins on a cold start.
+        val store = FavoritesStore(this)
+        val savedLanguage = runBlocking { store.language.first() }
+        val code = savedLanguage ?: "ka"
+        LocaleHelper.applyLanguage(code)
+        if (savedLanguage == null) {
+            lifecycleScope.launch { store.saveLanguage("ka") }
+        }
         Configuration.getInstance().userAgentValue = packageName
         Configuration.getInstance().load(
             this,
@@ -352,20 +379,57 @@ fun FakeGpsScreen() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.app_name),
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Box(
+                modifier = Modifier
+                    .size(46.dp)
+                    .clip(CircleShape)
+                    .background(
+                        Brush.linearGradient(
+                            listOf(Color(0xFF5B9DFF), Color(0xFF2F6BFF))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.LocationOn,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+            Column(modifier = Modifier.padding(start = 12.dp)) {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    lineHeight = 24.sp
+                )
+                Text(
+                    text = stringResource(R.string.tagline),
+                    fontSize = 12.sp,
+                    color = Color(0xFF9AA5B1)
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
             // Language picker: shows the current language code.
             Box {
-                OutlinedButton(onClick = { showLangMenu = true }) {
-                    Text(language.uppercase())
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0xFF1A2438),
+                    modifier = Modifier.size(42.dp)
+                ) {
+                    IconButton(onClick = { showLangMenu = true }) {
+                        Text(
+                            text = language.uppercase(),
+                            color = Color(0xFF7FB0FF),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
                 DropdownMenu(
                     expanded = showLangMenu,
@@ -394,12 +458,19 @@ fun FakeGpsScreen() {
                     )
                 }
             }
-            IconButton(onClick = { showSetup = true }) {
-                Icon(
-                    imageVector = Icons.Filled.Settings,
-                    contentDescription = stringResource(R.string.setup_title),
-                    tint = Color.White
-                )
+            Spacer(modifier = Modifier.width(8.dp))
+            Surface(
+                shape = CircleShape,
+                color = Color(0xFF1A2438),
+                modifier = Modifier.size(42.dp)
+            ) {
+                IconButton(onClick = { showSetup = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = stringResource(R.string.setup_title),
+                        tint = Color.White
+                    )
+                }
             }
         }
 
@@ -407,7 +478,7 @@ fun FakeGpsScreen() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
@@ -419,18 +490,39 @@ fun FakeGpsScreen() {
                 keyboardActions = KeyboardActions(
                     onSearch = { viewModel.search(query) }
                 ),
-                modifier = Modifier.weight(1f)
+                shape = RoundedCornerShape(28.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color(0xFF1A2438),
+                    unfocusedContainerColor = Color(0xFF1A2438),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = Color.White,
+                    unfocusedTextColor = Color.White,
+                    focusedPlaceholderColor = Color(0xFF8A94A6),
+                    unfocusedPlaceholderColor = Color(0xFF8A94A6)
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .shadow(6.dp, RoundedCornerShape(28.dp))
             )
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
-                onClick = { viewModel.search(query) },
-                enabled = query.isNotBlank()
+            Spacer(modifier = Modifier.width(10.dp))
+            Surface(
+                shape = CircleShape,
+                color = Color(0xFF2F6BFF),
+                modifier = Modifier
+                    .size(50.dp)
+                    .shadow(6.dp, CircleShape)
             ) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(R.string.search),
-                    tint = Color.White
-                )
+                IconButton(
+                    onClick = { viewModel.search(query) },
+                    enabled = query.isNotBlank()
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = stringResource(R.string.search),
+                        tint = Color.White
+                    )
+                }
             }
         }
         if (searching) {
@@ -468,29 +560,45 @@ fun FakeGpsScreen() {
         }
 
         // ---- Mock-app warning ----
-        if (!isMockApp) {
+        // Hidden while mocking is actually running: a running mock proves
+        // the app IS selected, even if the system setting read says otherwise
+        // (seen on HyperOS, where the read is unreliable).
+        if (!isMockApp && !isMocking) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp),
+                    .padding(start = 20.dp, end = 20.dp, top = 12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF7A2E0E)
+                    containerColor = Color(0xFF3A2410)
+                ),
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp, Color(0x66FFB020)
                 )
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
+                Column(modifier = Modifier.padding(14.dp)) {
                     Text(
                         text = stringResource(R.string.mock_not_selected_warning),
-                        color = Color.White
+                        color = Color(0xFFFFD9A0),
+                        fontSize = 14.sp
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     Button(
                         onClick = {
                             context.startActivity(
                                 Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS)
                             )
-                        }
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFFB020),
+                            contentColor = Color(0xFF1A1206)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text(stringResource(R.string.open_dev_options))
+                        Text(
+                            stringResource(R.string.open_dev_options),
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }
@@ -544,10 +652,36 @@ fun FakeGpsScreen() {
                         .padding(top = 8.dp)
                         .background(
                             color = Color(0xCC0B0F19),
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 )
+            } else {
+                // Floating chip with the picked coordinates.
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 12.dp)
+                        .shadow(8.dp, RoundedCornerShape(20.dp))
+                        .background(Color(0xE61A2438), RoundedCornerShape(20.dp))
+                        .border(1.dp, Color(0x334C8DFF), RoundedCornerShape(20.dp))
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn,
+                        contentDescription = null,
+                        tint = Color(0xFF7FB0FF),
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "%.5f, %.5f".format(picked.latitude, picked.longitude),
+                        color = Color.White,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp
+                    )
+                }
             }
         }
 
@@ -555,25 +689,55 @@ fun FakeGpsScreen() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp)
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp))
+                .background(Color(0xFF101828))
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
-            picked?.let { point ->
-                Text(
-                    text = stringResource(R.string.picked_point) + ": " +
-                        "%.5f, %.5f".format(point.latitude, point.longitude),
-                    color = Color.White
-                )
-            }
             if (mockState is MockState.Mocking) {
                 val m = mockState as MockState.Mocking
-                Text(
-                    text = stringResource(R.string.current_fake_location) + ": " +
-                        "%.5f, %.5f".format(m.latitude, m.longitude),
-                    color = Color(0xFF7CFC9A),
-                    fontWeight = FontWeight.Bold
+                val pulse = rememberInfiniteTransition(label = "pulse")
+                val alpha by pulse.animateFloat(
+                    initialValue = 0.35f, targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(900), repeatMode = RepeatMode.Reverse
+                    ), label = "pulseAlpha"
                 )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(Color(0xFF0E3B22), Color(0xFF14532D))
+                            ),
+                            RoundedCornerShape(16.dp)
+                        )
+                        .border(1.dp, Color(0x5534D399), RoundedCornerShape(16.dp))
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF34D399).copy(alpha = alpha))
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column {
+                        Text(
+                            text = stringResource(R.string.mocking_active),
+                            color = Color(0xFF7CFC9A),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                        Text(
+                            text = "%.5f, %.5f".format(m.latitude, m.longitude),
+                            color = Color.White,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -597,24 +761,39 @@ fun FakeGpsScreen() {
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (isMocking) {
-                            Color(0xFFB3261E)
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
+                        containerColor = Color.Transparent
                     ),
+                    shape = RoundedCornerShape(18.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .height(56.dp)
+                        .height(60.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                if (isMocking) {
+                                    listOf(Color(0xFFE5484D), Color(0xFFB3261E))
+                                } else {
+                                    listOf(Color(0xFF5B9DFF), Color(0xFF2F6BFF))
+                                }
+                            ),
+                            RoundedCornerShape(18.dp)
+                        )
+                        .shadow(8.dp, RoundedCornerShape(18.dp))
                 ) {
+                    Icon(
+                        imageVector = if (isMocking) Icons.Filled.Stop else Icons.Filled.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = if (isMocking) {
                             stringResource(R.string.stop)
                         } else {
                             stringResource(R.string.start)
                         },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 19.sp,
+                        fontWeight = FontWeight.ExtraBold
                     )
                 }
                 OutlinedButton(
@@ -648,18 +827,26 @@ fun FakeGpsScreen() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(favorites) { fav ->
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface
-                            )
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color(0xFF1A2438),
+                            modifier = Modifier.shadow(4.dp, RoundedCornerShape(20.dp))
                         ) {
                             Row(
-                                modifier = Modifier.padding(start = 12.dp),
+                                modifier = Modifier.padding(start = 12.dp, top = 6.dp, bottom = 6.dp, end = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Icon(
+                                    imageVector = Icons.Filled.LocationOn,
+                                    contentDescription = null,
+                                    tint = Color(0xFF7FB0FF),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = fav.name,
                                     color = Color.White,
+                                    fontWeight = FontWeight.Medium,
                                     modifier = Modifier.clickable {
                                         val point = GeoPoint(fav.latitude, fav.longitude)
                                         viewModel.pick(point)
@@ -667,12 +854,14 @@ fun FakeGpsScreen() {
                                     }
                                 )
                                 IconButton(
-                                    onClick = { favoriteToDelete = fav }
+                                    onClick = { favoriteToDelete = fav },
+                                    modifier = Modifier.size(28.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Filled.Delete,
+                                        imageVector = Icons.Filled.Close,
                                         contentDescription = stringResource(R.string.delete),
-                                        tint = Color(0xFFFF6B6B)
+                                        tint = Color(0xFFFF6B6B),
+                                        modifier = Modifier.size(16.dp)
                                     )
                                 }
                             }
