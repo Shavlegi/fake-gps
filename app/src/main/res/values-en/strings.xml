@@ -16,7 +16,8 @@
     <string name="delete">Delete</string>
     <string name="delete_favorite_confirm">Delete this favorite?</string>
     <string name="setup_title">Setup</string>
-    <string name="setup_steps">1. Settings → About phone\n2. Tap Build number 7 times (Developer options will turn on)\n3. Developer options → Select mock location app\n4. Choose Fake GPS\n5. Come back, pick a place and press Start</string>
+    <string name="setup_steps">1. Settings → About phone\n2. Tap MIUI version 7 times (Developer options will turn on; on other phones tap Build number)\n3. Developer options → Select mock location app\n4. Choose Fake GPS\n5. Come back, pick a place and press Start</string>
+    <string name="location_permission_needed">Location permission is needed — allow it, otherwise Start will not work. (Settings → Apps → Fake GPS → Permissions → Location)</string>
     <string name="open_dev_options">Open Developer options</string>
     <string name="mock_not_selected_warning">The app is not selected as the mock location app — set it up first, otherwise teleport will not work.</string>
     <string name="mock_failed">Could not start — check that Fake GPS is selected as the mock location app.</string>
