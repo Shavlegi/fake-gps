@@ -101,7 +101,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.tileprovider.tilesource.XYTileSource
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -111,16 +110,11 @@ import org.osmdroid.views.overlay.Marker
 /** Akhaltsikhe — home. The map opens here on first launch. */
 private val HOME_POINT = GeoPoint(41.8458, 42.9996)
 
-/** CARTO dark tiles: fast CDN and they match the app's dark theme.
- *  osmdroid 6.1.20 has no built-in CARTO source, so define it directly. */
-private val CARTO_DARK = XYTileSource(
-    "CartoDark", 4, 19, 256, ".png",
-    arrayOf(
-        "https://a.basemaps.cartocdn.com/dark_all/",
-        "https://b.basemaps.cartocdn.com/dark_all/",
-        "https://c.basemaps.cartocdn.com/dark_all/",
-        "https://d.basemaps.cartocdn.com/dark_all/"
-    )
+/** OpenStreetMap, German server — free, no API key needed.
+ *  (CARTO now stamps "API KEY REQUIRED" on every tile, so it is out.) */
+private val OSM_DE = XYTileSource(
+    "OSMDE", 0, 19, 256, ".png",
+    arrayOf("https://tile.openstreetmap.de/")
 )
 
 class FakeGpsViewModel(application: Application) : AndroidViewModel(application) {
@@ -618,15 +612,19 @@ fun FakeGpsScreen() {
             }
         }
 
-        // ---- Map ----
-        Box(modifier = Modifier.weight(1f)) {
+        // ---- Map in a rounded box ----
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(1.dp, Color(0xFF2A3550), RoundedCornerShape(16.dp))
+        ) {
             AndroidView(
                 factory = { ctx ->
                     MapView(ctx).apply {
-                        // CARTO dark tiles: fast CDN (no more grey squares
-                        // waiting on the slow OSM tile server) and they match
-                        // the app's dark theme.
-                        setTileSource(CARTO_DARK)
+                        // OSM tiles, German server: no API key needed.
+                        setTileSource(OSM_DE)
                         setBuiltInZoomControls(false)
                         setBackgroundColor(
                             android.graphics.Color.parseColor("#0B0F19")
@@ -748,7 +746,7 @@ fun FakeGpsScreen() {
             }
             // Tile attribution, required by the map data providers.
             Text(
-                text = "© OpenStreetMap © CARTO",
+                text = "© OpenStreetMap contributors",
                 color = Color(0x99FFFFFF),
                 fontSize = 10.sp,
                 modifier = Modifier
