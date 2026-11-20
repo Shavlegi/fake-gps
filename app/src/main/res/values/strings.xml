@@ -16,7 +16,8 @@
     <string name="delete">წაშლა</string>
     <string name="delete_favorite_confirm">წავშალო ეს ფავორიტი?</string>
     <string name="setup_title">დაყენება</string>
-    <string name="setup_steps">1. Settings → About phone\n2. Build number-ზე დააჭირე 7-ჯერ (Developer options ჩაირთვება)\n3. Developer options → Select mock location app\n4. აირჩიე Fake GPS\n5. დაბრუნდი აპში, აირჩიე ადგილი და დააჭირე დაწყებას</string>
+    <string name="setup_steps">1. Settings → About phone\n2. MIUI version-ზე დააჭირე 7-ჯერ (Developer options ჩაირთვება; სხვა ტელეფონზე — Build number-ზე)\n3. Developer options → Select mock location app\n4. აირჩიე Fake GPS\n5. დაბრუნდი აპში, აირჩიე ადგილი და დააჭირე დაწყებას</string>
+    <string name="location_permission_needed">ლოკაციის ნებართვა სჭირდება — მიეცი, თორემ Start-ი არ იმუშავებს. (Settings → Apps → Fake GPS → Permissions → Location)</string>
     <string name="open_dev_options">Developer options-ის გახსნა</string>
     <string name="mock_not_selected_warning">აპი არ არის არჩეული mock location აპად — ჯერ დააყენე, თორემ ტელეპორტი არ იმუშავებს.</string>
     <string name="mock_failed">ვერ ჩაირთო — შეამოწმე, რომ Fake GPS არჩეულია mock location აპად.</string>
