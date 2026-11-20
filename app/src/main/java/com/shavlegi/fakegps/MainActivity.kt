@@ -45,7 +45,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
- 
+
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -294,6 +294,7 @@ class MainActivity : AppCompatActivity() {
             lifecycleScope.launch { store.saveLanguage("ka") }
         }
         Configuration.getInstance().userAgentValue = packageName
+        Configuration.getInstance().tileDownloadThreads = 4
         Configuration.getInstance().load(
             this,
             getSharedPreferences("osmdroid", MODE_PRIVATE)
@@ -609,7 +610,16 @@ fun FakeGpsScreen() {
             AndroidView(
                 factory = { ctx ->
                     MapView(ctx).apply {
-                        setTileSource(TileSourceFactory.MAPNIK)
+                        // CARTO dark tiles: fast CDN (no more grey squares
+                        // waiting on the slow OSM tile server) and they match
+                        // the app's dark theme.
+                        setTileSource(TileSourceFactory.CARTODB_DARK_MATTER)
+                        setBuiltInZoomControls(false)
+                        setBackgroundColor(
+                            androidx.compose.ui.graphics.Color(0xFF0B0F19).toArgb()
+                        )
+                        minZoomLevel = 4.0
+                        maxZoomLevel = 19.0
                         setMultiTouchControls(true)
                         controller.setZoom(15.0)
                         controller.setCenter(picked ?: HOME_POINT)
@@ -683,6 +693,55 @@ fun FakeGpsScreen() {
                     )
                 }
             }
+            // Custom zoom buttons (the built-in white squares looked bad).
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(end = 12.dp, bottom = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0xE61A2438),
+                    modifier = Modifier
+                        .size(44.dp)
+                        .shadow(6.dp, CircleShape)
+                ) {
+                    IconButton(onClick = { mapViewRef?.controller?.zoomIn() }) {
+                        Text(
+                            text = "+",
+                            color = Color.White,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+                Surface(
+                    shape = CircleShape,
+                    color = Color(0xE61A2438),
+                    modifier = Modifier
+                        .size(44.dp)
+                        .shadow(6.dp, CircleShape)
+                ) {
+                    IconButton(onClick = { mapViewRef?.controller?.zoomOut() }) {
+                        Text(
+                            text = "−",
+                            color = Color.White,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+            // Tile attribution, required by the map data providers.
+            Text(
+                text = "© OpenStreetMap © CARTO",
+                color = Color(0x99FFFFFF),
+                fontSize = 10.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(start = 8.dp, bottom = 6.dp)
+            )
         }
 
         // ---- Bottom panel ----
